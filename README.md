@@ -1,6 +1,6 @@
 # Proxy through VPN connection in a Docker container
 
-![Image of Yaktocat](vpncontainer.png)
+![vpncontainer](vpncontainer.png)
 
 ## Introduction
 `vpn-as-a-container` is a SOCKS5 proxy server chaining with a NordVPN connection. It includes:
