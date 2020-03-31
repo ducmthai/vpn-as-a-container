@@ -12,13 +12,13 @@ ARG localnet="192.168.0.0/24"
 ARG proxy_port=3128
 
 COPY --from=builder /go/bin/brook /usr/bin
+COPY vpn /vpn
 
 RUN echo "@testing http://dl-cdn.alpinelinux.org/alpine/edge/testing/" >> /etc/apk/repositories \
   && apk --update --no-cache add openvpn ufw@testing runit \
   && rm -rf /var/cache/apk/* \
   && find /vpn -name run | xargs chmod u+x
 
-COPY vpn /vpn
 ENV REGION=${region} \
     USERNAME=${username} \
     PASSWORD=${password} \
