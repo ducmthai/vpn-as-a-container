@@ -1,0 +1,31 @@
+version: '3.7'
+services:
+  vpncontainer:
+    image: ducmthai/vpncontainer:latest
+    build:
+      context: ./
+    container_name: vpncontainer
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
+    dns:
+      - 103.86.96.100
+      - 103.86.99.100
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    env_file: .env
+    networks:
+      - vpncontainer
+    ports:
+      - ${PROXY_PORT}:${PROXY_PORT}
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10M"
+        max-file: "10"
+
+networks:
+  vpncontainer:
+    name: vpncontainer

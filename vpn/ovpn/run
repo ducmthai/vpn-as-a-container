@@ -1,0 +1,35 @@
+#!/bin/sh
+set -e -u -o pipefail
+
+if [ -z "$REGION" ]; then
+  echo "No region is set. Exiting."
+  exit 1
+fi
+
+if [ -z "$PROTOCOL" ]; then
+  echo "No protocol is set. Exiting."
+  exit 1
+fi
+
+if [ -z "$USERNAME" ]; then
+  echo "No username is set. Exiting."
+  exit 1
+fi
+
+if [ -z "$PASSWORD" ]; then
+  echo "No password is set. Exiting."
+  exit 1
+fi
+CONFIG_PATH=/vpn/ovpn/config/ovpn_${PROTOCOL}/${REGION}.nordvpn.com.${PROTOCOL}.ovpn
+if [ ! -f ${CONFIG_PATH} ]; then
+  echo "${CONFIG_PATH} is not exist. Exiting"
+  exit 1
+fi
+
+set -- "$@" '--config' "${CONFIG_PATH}"
+echo "Setting username and password"
+echo "$USERNAME" > auth.conf
+echo "$PASSWORD" >> auth.conf
+chmod 600 auth.conf
+set -- "$@" '--auth-user-pass' 'auth.conf'
+openvpn "$@"
