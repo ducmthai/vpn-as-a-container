@@ -1,6 +1,9 @@
 #!/bin/sh
 set -e -u -o pipefail
 
+gw=$(ip route | awk '/default/ {print $3}')
+ip route add to ${LOCAL_NETWORK} via $gw dev eth0
+
 if [ -z "$REGION" ]; then
   echo "No region is set. Exiting."
   exit 1
