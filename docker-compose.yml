@@ -15,7 +15,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./vpn.config:/vpn/vpn.config:ro
-    #env_file: .env
+    env_file: .env
     networks:
       - vpncontainer
     ports:

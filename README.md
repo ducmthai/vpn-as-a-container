@@ -29,14 +29,21 @@ vpn
 ## Starting the VPN Proxy
 ### `vpn.config`
 
-The main configuration file. This should be the only file which needs user modifications.
+The main configuration file, contain the following values:
 
 - `REGION`: (Optional) The default server is set to `ie33`. `REGION` should match the supported NordVPN `.opvn` server config.
 - `USERNAME`: NordVPN username.
 - `PASSWORD`: NordVPN password.
-- `LOCAL_NETWORK` - The CIDR mask of the local IP addresses (e.g. 192.168.0.1/24, 10.1.1.0/24) which will be acessing the proxy. This is so the response to a request can be returned to the client (i.e. your browser).
-- `PROXY_PORT`: Proxy port
 - `PROTOCOL`: UDP or TCP which are supported by NordVPN.
+
+## Environment variables
+
+The environment variables needed for exposing the proxy to the local network:
+
+- `PROXY_PORT`: Proxy port
+- `LOCAL_NETWORK`: The CIDR mask of the local IP addresses (e.g. 192.168.0.1/24, 10.1.1.0/24) which will be acessing the proxy. This is so the response to a request can be returned to the client (i.e. your browser).
+
+These variables can be specified in the command line or in the `.env` file in the case of `docker-compose`.
 
 ### Start with `docker run`
 
@@ -48,6 +55,8 @@ docker run -d \
 --name=vpn_proxy \
 --dns=103.86.96.100 --dns=103.86.99.100 \
 --restart=always \
+-e "PROXY_PORT=3128" \
+-e "LOCAL_NETWORK=192.168.0.1/24" \
 -v /etc/localtime:/etc/localtime:ro \
 -v ./vpn.config:/vpn/vpn.config:ro \
 -p 3128:3128 \
