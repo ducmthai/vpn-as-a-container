@@ -14,8 +14,8 @@ ARG proxy_port=3128
 COPY --from=builder /go/bin/brook /usr/bin
 COPY vpn /vpn
 
-RUN echo "@testing http://dl-cdn.alpinelinux.org/alpine/edge/testing/" >> /etc/apk/repositories \
-  && apk --update --no-cache add openvpn ufw@testing runit \
+RUN echo "@community http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
+  && apk --update --no-cache add openvpn ufw@community runit \
   && rm -rf /var/cache/apk/* \
   && find /vpn -name run | xargs chmod u+x
 

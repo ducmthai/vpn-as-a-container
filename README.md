@@ -27,16 +27,18 @@ vpn
 ```
 
 ## Starting the VPN Proxy
+### `vpn.config`
 
-### Environment Variables
+The main configuration file. This should be the only file which needs user modifications.
 
-`REGION` is optional. The default server is set to `ie33`. `REGION` should match the supported NordVPN `.opvn` server config. 
+- `REGION`: (Optional) The default server is set to `ie33`. `REGION` should match the supported NordVPN `.opvn` server config.
+- `USERNAME`: NordVPN username.
+- `PASSWORD`: NordVPN password.
+- `LOCAL_NETWORK` - The CIDR mask of the local IP addresses (e.g. 192.168.0.1/24, 10.1.1.0/24) which will be acessing the proxy. This is so the response to a request can be returned to the client (i.e. your browser).
+- `PROXY_PORT`: Proxy port
+- `PROTOCOL`: UDP or TCP which are supported by NordVPN.
 
-`USERNAME` / `PASSWORD` - NordVPN account details.
-
-`LOCAL_NETWORK` - The CIDR mask of the local IP addresses (e.g. 192.168.0.0/24, 10.1.1.0/24) which accesses the proxy.
-
-### Bring up `vpncontainer`
+### Start with `docker run`
 
 ```Shell
 docker build -t ducmthai/vpncontainer .
@@ -46,22 +48,15 @@ docker run -d \
 --name=vpn_proxy \
 --dns=103.86.96.100 --dns=103.86.99.100 \
 --restart=always \
--e "REGION=ie33" \
--e "USERNAME=<nordvpn_username>" \
--e "PASSWORD=<nordvpn_password>" \
--e "LOCAL_NETWORK=192.168.0.0/24" \
--e "PROTOCOL=udp" \
--e "PROXY_PORT=3128" \
 -v /etc/localtime:/etc/localtime:ro \
+-v ./vpn.config:/vpn/vpn.config:ro \
 -p 3128:3128 \
 ducmthai/vpncontainer
 ```
 
-Substitute the environment variables for `REGION`, `USERNAME`, `PASSWORD`, `LOCAL_NETWORK`, `PROTOCOL` and `PROXY_PORT` as indicated. `udp` has much better performance.
+### Start with `docker-compose`
 
-A `docker-compose.yml` file is also provided. Supply NordVPN credentials and local network cidr in `.env` by providing values to `USERNAME`, `PASSWORD` and `LOCAL_NETWORK`.
-
-Then start the container:
+A `docker-compose.yml` file is also provided:
 
 ```Shell
 docker-compose up -d
@@ -69,7 +64,7 @@ docker-compose up -d
 
 ## Connecting to the VPN Proxy
 
-Set proxy on host machine to socks5://127.0.0.1:${PROXY_PORT}.
+Set proxy on host machine to `socks5://127.0.0.1:${PROXY_PORT}`.
 
 ```Shell
 curl -x socks5h://127.0.0.1:3128 -L ifconfig.co/json

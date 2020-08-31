@@ -30,4 +30,4 @@ ufw status
 echo "Starting brook proxy socks5 on port ${PROXY_PORT}"
 
 # start
-brook socks5 -l :${PROXY_PORT} -i 0.0.0.0 &> /dev/null
+brook socks5 --socks5 0.0.0.0:${PROXY_PORT} &> /dev/null

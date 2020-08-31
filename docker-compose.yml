@@ -14,7 +14,8 @@ services:
       - 103.86.99.100
     volumes:
       - /etc/localtime:/etc/localtime:ro
-    env_file: .env
+      - ./vpn.config:/vpn/vpn.config:ro
+    #env_file: .env
     networks:
       - vpncontainer
     ports:
