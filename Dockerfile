@@ -1,6 +1,6 @@
 FROM golang:alpine as builder
 RUN set -ex && apk add --update git \
-	&& go get -u -v github.com/txthinking/brook/cli/brook
+  && go get -u -v github.com/txthinking/brook/cli/brook
 
 FROM alpine:latest
 
@@ -20,10 +20,10 @@ RUN echo "@community http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /et
   && find /vpn -name run | xargs chmod u+x
 
 ENV REGION=${region} \
-    USERNAME=${username} \
-    PASSWORD=${password} \
-    PROTOCOL=${protocol} \
-    LOCAL_NETWORK=${localnet} \
-    PROXY_PORT=${proxy_port}
+  USERNAME=${username} \
+  PASSWORD=${password} \
+  PROTOCOL=${protocol} \
+  LOCAL_NETWORK=${localnet} \
+  PROXY_PORT=${proxy_port}
 
 CMD ["runsvdir", "/vpn"]

@@ -1,4 +1,13 @@
 #!/bin/sh
+set -e -u -o pipefail
+
+if [ ! -r /vpn/vpn.config ]; then
+  echo "Could not load config file from /vpn/vpn.config. Please check your volume config" 1>&2
+  exit 1
+fi
+
+source /vpn/vpn.config
+
 sleep 10
 if [ -z "${PROXY_PORT}" ]; then
   echo "No port is set, exiting"
@@ -14,7 +23,7 @@ echo "Enabling kill switch"
 sed -i 's/IPV6=yes/IPV6=no/g' /etc/default/ufw
 
 # Get docker network subnet cidr on eth0
-subnet_cidr=$(ip -o -f inet addr show | grep eth0 |  awk '/scope global/ {print $4}')
+subnet_cidr=$(ip -o -f inet addr show | grep eth0 | awk '/scope global/ {print $4}')
 ufw default deny incoming
 ufw default deny outgoing
 ufw allow in on tun0
@@ -30,4 +39,4 @@ ufw status
 echo "Starting brook proxy socks5 on port ${PROXY_PORT}"
 
 # start
-brook socks5 --socks5 0.0.0.0:${PROXY_PORT} &> /dev/null
+brook socks5 --socks5 0.0.0.0:${PROXY_PORT} &>/dev/null

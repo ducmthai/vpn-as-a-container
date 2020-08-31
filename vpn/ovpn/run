@@ -1,6 +1,13 @@
 #!/bin/sh
 set -e -u -o pipefail
 
+if [ ! -r /vpn/vpn.config ]; then
+  echo "Could not load config file from /vpn/vpn.config. Please check your volume config" 1>&2
+  exit 1
+fi
+
+source /vpn/vpn.config
+
 gw=$(ip route | awk '/default/ {print $3}')
 ip route add to ${LOCAL_NETWORK} via $gw dev eth0
 
@@ -31,8 +38,8 @@ fi
 
 set -- "$@" '--config' "${CONFIG_PATH}"
 echo "Setting username and password"
-echo "$USERNAME" > auth.conf
-echo "$PASSWORD" >> auth.conf
+echo "$USERNAME" >auth.conf
+echo "$PASSWORD" >>auth.conf
 chmod 600 auth.conf
 set -- "$@" '--auth-user-pass' 'auth.conf'
 openvpn "$@"
