@@ -15,7 +15,7 @@ if [ -z "${PROXY_PORT}" ]; then
 fi
 
 # Get remote target for kill switch whitelist
-export CONFIG_PATH=/vpn/ovpn/config/ovpn_${PROTOCOL}/${REGION}.nordvpn.com.${PROTOCOL}.ovpn
+CONFIG_PATH=/vpn/ovpn/config/ovpn_${PROTOCOL}/${REGION}.nordvpn.com.${PROTOCOL}.ovpn
 REMOTE_TARGET=$(grep 'remote ' ${CONFIG_PATH} | awk '/remote/ {print $2}')
 
 echo "Enabling kill switch"
@@ -23,15 +23,15 @@ echo "Enabling kill switch"
 sed -i 's/IPV6=yes/IPV6=no/g' /etc/default/ufw
 
 # Get docker network subnet cidr on eth0
-subnet_cidr=$(ip -o -f inet addr show | grep eth0 | awk '/scope global/ {print $4}')
+SUBNET_CIDR=$(ip -o -f inet addr show | grep eth0 | awk '/scope global/ {print $4}')
 ufw default deny incoming
 ufw default deny outgoing
 ufw allow in on tun0
 ufw allow out on tun0
 ufw allow in on eth0 to any port ${PROXY_PORT} from ${LOCAL_NETWORK}
-ufw allow in on eth0 to any port ${PROXY_PORT} from ${subnet_cidr}
+ufw allow in on eth0 to any port ${PROXY_PORT} from ${SUBNET_CIDR}
 ufw allow out on eth0 to ${LOCAL_NETWORK}
-ufw allow out on eth0 to ${subnet_cidr}
+ufw allow out on eth0 to ${SUBNET_CIDR}
 ufw allow out on eth0 to ${REMOTE_TARGET}
 ufw enable
 ufw status
