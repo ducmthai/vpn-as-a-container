@@ -1,0 +1,71 @@
+#!/usr/bin/with-contenv sh
+
+source ${CONTAINER_CFG}
+
+if [ -z "${PROXY_MODE}" ]; then
+  echo "No PROXY_MODE is set, exiting"
+  exit 1
+fi
+
+echo -e "${PROXY_MODE}" >/var/run/s6/container_environment/PROXY_MODE
+
+if [ -z "${USERNAME}" ]; then
+  echo "No username is set, exiting"
+  exit 1
+fi
+
+if [ -z "${PASSWORD}" ]; then
+  echo "No password is set, exiting"
+  exit 1
+fi
+
+echo "Setting username and password"
+echo "$USERNAME" >/vpn/auth.conf
+echo "$PASSWORD" >>/vpn/auth.conf
+chmod 400 /vpn/auth.conf
+
+echo -e "/vpn/auth.conf" >/var/run/s6/container_environment/AUTH_CFG
+echo -e "/var/run/openvpn.pid" >/var/run/s6/container_environment/OVPN_PID
+
+[[ ! -f "/vpn/config/updated" ]] &&
+  curl -sSL -N https://downloads.nordcdn.com/configs/archives/servers/ovpn.zip -o /vpn/config/ovpn.zip &&
+  unzip -o /vpn/config/ovpn.zip -d /vpn/config/ &&
+  rm /vpn/config/ovpn.zip &&
+  touch /vpn/config/updated
+chmod +x /etc/periodic/monthly/update-nordvpn-profiles
+
+gw=$(ip route | awk '/default/ {print $3}')
+ip route add to ${LOCAL_NETWORK} via $gw dev eth0
+
+OVPN_CONFIG_PATH="/vpn/config/ovpn_${PROTOCOL}/${REGION}.nordvpn.com.${PROTOCOL}.ovpn"
+echo -e "/vpn/config/ovpn_${PROTOCOL}/${REGION}.nordvpn.com.${PROTOCOL}.ovpn" >/var/run/s6/container_environment/OVPN_CONFIG_PATH
+
+if [ ! -f ${OVPN_CONFIG_PATH} ]; then
+  echo "${OVPN_CONFIG_PATH} is not exist. Exiting"
+  exit 1
+fi
+# Get remote target for kill switch whitelist
+REMOTE_TARGET=$(grep 'remote ' ${OVPN_CONFIG_PATH} | awk '/remote/ {print $2}')
+
+# Disable ufw ipv6
+sed -i 's/IPV6=yes/IPV6=no/g' /etc/default/ufw
+
+echo "Enabling kill switch"
+# Get docker network subnet cidr on eth0
+SUBNET_CIDR=$(ip -o -f inet addr show | grep eth0 | awk '/scope global/ {print $4}')
+ufw default deny incoming
+ufw default deny outgoing
+ufw allow in on tun0
+ufw allow out on tun0
+ufw allow in on eth0 to any port ${PROXY_PORT} from ${LOCAL_NETWORK}
+ufw allow in on eth0 to any port ${PROXY_PORT} from ${SUBNET_CIDR}
+ufw allow out on eth0 to ${LOCAL_NETWORK}
+ufw allow out on eth0 to ${SUBNET_CIDR}
+ufw allow out on eth0 to ${REMOTE_TARGET}
+ufw enable
+ufw status
+
+if [ ${PROXY_MODE} == "http" ]; then
+  echo "Privoxy is enabled!"
+  echo -e "\nlisten-address  0.0.0.0:${PROXY_PORT}" >>/etc/privoxy/config
+fi

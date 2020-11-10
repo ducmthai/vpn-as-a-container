@@ -1,0 +1,23 @@
+#!/bin/sh
+
+if [[ $(ls /var/run/s6/container_environment/ | grep 'FILE__') ]]; then
+  for FILENAME in /var/run/s6/container_environment/*; do
+    if [ $(echo "${FILENAME##*/}" | grep 'FILE__') ]; then
+      SECRETFILE=$(cat ${FILENAME})
+      if [[ -f ${SECRETFILE} ]]; then
+        FILESTRIP=$(echo ${FILENAME} | sed s/FILE__//g)
+        cat ${SECRETFILE} > ${FILESTRIP}
+        echo "[env-init] ${FILESTRIP##*/} set from ${FILENAME##*/}"
+      else
+        echo "[env-init] cannot find secret in ${FILENAME##*/}"
+      fi
+    fi
+  done
+fi
+
+if [ ! -r /vpn/vpn.config ]; then
+  echo "Could not load config file from /vpn/vpn.config. Please check your volume config" 1>&2
+  exit 1
+fi
+
+echo "/vpn/vpn.config" > /var/run/s6/container_environment/CONTAINER_CFG

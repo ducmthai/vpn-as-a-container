@@ -1,0 +1,37 @@
+#!/usr/bin/with-contenv sh
+set -e -u -o pipefail
+
+if [ ! -r ${CONTAINER_CFG} ]; then
+  echo "Could not load config file from ${CONTAINER_CFG}. Please check your volume config" 1>&2
+  exit 1
+fi
+
+source ${CONTAINER_CFG}
+
+if [ -z "$REGION" ]; then
+  echo "No region is set. Exiting."
+  exit 1
+fi
+
+if [ -z "$PROTOCOL" ]; then
+  echo "No protocol is set. Exiting."
+  exit 1
+fi
+
+if [ -z "$USERNAME" ]; then
+  echo "No username is set. Exiting."
+  exit 1
+fi
+
+if [ -z "$PASSWORD" ]; then
+  echo "No password is set. Exiting."
+  exit 1
+fi
+
+
+if [ ! -f ${OVPN_CONFIG_PATH} ]; then
+  echo "${OVPN_CONFIG_PATH} is not exist. Exiting"
+  exit 1
+fi
+
+openvpn --writepid ${OVPN_PID} --config ${OVPN_CONFIG_PATH} --auth-user-pass ${AUTH_CFG}
