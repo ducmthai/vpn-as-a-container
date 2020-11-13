@@ -67,5 +67,5 @@ ufw status
 
 if [ ${PROXY_MODE} == "http" ]; then
   echo "Privoxy is enabled!"
-  echo -e "\nlisten-address  0.0.0.0:${PROXY_PORT}" >>/etc/privoxy/config
+  echo -e "confdir /etc/privoxy\nlisten-address  0.0.0.0:${PROXY_PORT}" >/etc/privoxy/config
 fi
