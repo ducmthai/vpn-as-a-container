@@ -7,6 +7,8 @@ services:
     container_name: vpncontainer
     cap_add:
       - NET_ADMIN
+      - NET_RAW
+      - SYS_MODULE
     devices:
       - /dev/net/tun
     dns:
