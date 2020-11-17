@@ -28,7 +28,7 @@ echo -e "/vpn/auth.conf" >/var/run/s6/container_environment/AUTH_CFG
 echo -e "/var/run/openvpn.pid" >/var/run/s6/container_environment/OVPN_PID
 
 [[ ! -f "/vpn/config/updated" ]] &&
-  curl -sSL -N https://downloads.nordcdn.com/configs/archives/servers/ovpn.zip -o /vpn/config/ovpn.zip &&
+  wget -nv https://downloads.nordcdn.com/configs/archives/servers/ovpn.zip -O /vpn/config/ovpn.zip &&
   unzip -o /vpn/config/ovpn.zip -d /vpn/config/ &&
   rm /vpn/config/ovpn.zip &&
   touch /vpn/config/updated
@@ -48,7 +48,7 @@ fi
 REMOTE_TARGET=$(grep 'remote ' ${OVPN_CONFIG_PATH} | awk '/remote/ {print $2}')
 
 # Disable ufw ipv6
-sed -i 's/IPV6=yes/IPV6=no/g' /etc/default/ufw
+#sed -i 's/IPV6=yes/IPV6=no/g' /etc/default/ufw
 
 echo "Enabling kill switch"
 # Get docker network subnet cidr on eth0

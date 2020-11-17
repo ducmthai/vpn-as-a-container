@@ -3,6 +3,6 @@ if [ ${NORD_PROFILES_UPDATE} == "no" ]; then
   exit 0
 fi
 
-curl -sSL -N https://downloads.nordcdn.com/configs/archives/servers/ovpn.zip -o /vpn/config/ovpn.zip &&
+wget -nv https://downloads.nordcdn.com/configs/archives/servers/ovpn.zip -O /vpn/config/ovpn.zip &&
   unzip -o /vpn/config/ovpn.zip -d /vpn/config/ &&
   rm /vpn/config/ovpn.zip
