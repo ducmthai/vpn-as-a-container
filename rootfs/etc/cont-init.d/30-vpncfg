@@ -7,8 +7,6 @@ if [ -z "${PROXY_MODE}" ]; then
   exit 1
 fi
 
-echo -e "${PROXY_MODE}" >/var/run/s6/container_environment/PROXY_MODE
-
 if [ -z "${USERNAME}" ]; then
   echo "No username is set, exiting"
   exit 1
@@ -34,6 +32,7 @@ echo -e "/var/run/openvpn.pid" >/var/run/s6/container_environment/OVPN_PID
   touch /vpn/config/updated
 chmod +x /etc/periodic/monthly/update-nordvpn-profiles
 
+# Add a route for local network to use the proxy
 gw=$(ip route | awk '/default/ {print $3}')
 ip route add to ${LOCAL_NETWORK} via $gw dev eth0
 
@@ -44,28 +43,18 @@ if [ ! -f ${OVPN_CONFIG_PATH} ]; then
   echo "${OVPN_CONFIG_PATH} is not exist. Exiting"
   exit 1
 fi
-# Get remote target for kill switch whitelist
-REMOTE_TARGET=$(grep 'remote ' ${OVPN_CONFIG_PATH} | awk '/remote/ {print $2}')
 
-# Disable ufw ipv6
-#sed -i 's/IPV6=yes/IPV6=no/g' /etc/default/ufw
-
-echo "Enabling kill switch"
-# Get docker network subnet cidr on eth0
-SUBNET_CIDR=$(ip -o -f inet addr show | grep eth0 | awk '/scope global/ {print $4}')
-ufw default deny incoming
-ufw default deny outgoing
-ufw allow in on tun0
-ufw allow out on tun0
-ufw allow in on eth0 to any port ${PROXY_PORT} from ${LOCAL_NETWORK}
-ufw allow in on eth0 to any port ${PROXY_PORT} from ${SUBNET_CIDR}
-ufw allow out on eth0 to ${LOCAL_NETWORK}
-ufw allow out on eth0 to ${SUBNET_CIDR}
-ufw allow out on eth0 to ${REMOTE_TARGET}
-ufw enable
-ufw status
-
-if [ ${PROXY_MODE} == "http" ]; then
-  echo "Privoxy is enabled!"
-  echo -e "confdir /etc/privoxy\nlisten-address  0.0.0.0:${PROXY_PORT}" >/etc/privoxy/config
+if [ ! -f /etc/3proxy/updated ]; then
+  if [ -n "${HC_PORT}" ]; then 
+    echo "Healthcheck port HTTP ${HC_PORT}"
+    echo "proxy -p${HC_PORT} -Detun0" >>/etc/3proxy/3proxy.cfg
+  fi
+  if [ ${PROXY_MODE} = "http" ]; then
+    echo "HTTP is enabled!"
+    echo "proxy -p${PROXY_PORT} -Detun0" >>/etc/3proxy/3proxy.cfg
+  else
+    echo "SOCKS5 is enabled!"
+    echo "socks -p${PROXY_PORT} -Detun0" >>/etc/3proxy/3proxy.cfg
+  fi
+  touch /etc/3proxy/updated
 fi

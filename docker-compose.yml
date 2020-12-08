@@ -1,4 +1,4 @@
-version: "3.7"
+version: "2.4"
 services:
   vpncontainer:
     image: ducmthai/nord:latest
@@ -7,8 +7,6 @@ services:
     container_name: vpncontainer
     cap_add:
       - NET_ADMIN
-      - NET_RAW
-      - SYS_MODULE
     devices:
       - /dev/net/tun
     dns:
@@ -17,8 +15,8 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./vpn.config:/vpn/vpn.config:ro
-      - nord_profiles:/vpn/config/
-      - ./vpnpasswd:/vpn/vpnpasswd:ro
+      # Uncomment the following line if you use FILE__PASSWORD
+      #- ./vpnpasswd:/vpn/vpnpasswd:ro
     env_file: .env
     networks:
       - vpncontainer
@@ -26,22 +24,22 @@ services:
       - ${PROXY_PORT}:${PROXY_PORT}
     restart: always
     sysctls:
-      - net.ipv6.conf.all.disable_ipv6=0
-      - net.ipv6.conf.default.disable_ipv6=0
-      - net.ipv6.conf.lo.disable_ipv6=0    
+      - net.ipv6.conf.all.disable_ipv6=1
+      - net.ipv6.conf.default.disable_ipv6=1
+      - net.ipv6.conf.lo.disable_ipv6=1    
       - net.ipv4.tcp_keepalive_intvl=45
       - net.ipv4.tcp_keepalive_probes=15
       - net.ipv4.tcp_keepalive_time=300    
     logging:
       driver: "json-file"
       options:
-        max-size: "10M"
-        max-file: "10"
-
+        max-size: "1M"
+        max-file: "1"
+    healthcheck:
+      test: /opt/utils/healthcheck.sh ${EXT_IP}
+      timeout: 10s
+      interval: 5m
+      retries: 10
 networks:
   vpncontainer:
     name: vpncontainer
-
-volumes:
-  nord_profiles:
-    name: nord_profiles
