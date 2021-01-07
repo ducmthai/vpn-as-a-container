@@ -35,7 +35,7 @@ chmod +x /etc/periodic/monthly/update-nordvpn-profiles
 
 # Add a route for local network to use the proxy
 gw=$(ip route | awk '/default/ {print $3}')
-ip route add to ${LOCAL_NETWORK} via $gw dev eth0
+ip route add ${LOCAL_NETWORK} via $gw dev eth0
 
 OVPN_CONFIG_PATH="/vpn/config/ovpn_${PROTOCOL}/${REGION}.nordvpn.com.${PROTOCOL}.ovpn"
 echo -e "/vpn/config/ovpn_${PROTOCOL}/${REGION}.nordvpn.com.${PROTOCOL}.ovpn" >/var/run/s6/container_environment/OVPN_CONFIG_PATH
