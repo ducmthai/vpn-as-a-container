@@ -26,6 +26,7 @@ echo -e "/vpn/auth.conf" >/var/run/s6/container_environment/AUTH_CFG
 echo -e "/var/run/openvpn.pid" >/var/run/s6/container_environment/OVPN_PID
 
 [[ ! -f "/vpn/config/updated" ]] &&
+  mkdir -p /vpn/config &&
   wget -nv https://downloads.nordcdn.com/configs/archives/servers/ovpn.zip -O /vpn/config/ovpn.zip &&
   unzip -o /vpn/config/ovpn.zip -d /vpn/config/ &&
   rm /vpn/config/ovpn.zip &&
