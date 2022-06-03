@@ -1,6 +1,7 @@
 # Proxy through VPN connection in a Docker container
 ## Changelog
 
+- v20220603: Add a `build.sh` script. Set s6-overlay version to 2.2.0.3. Update to version 3 pending.
 - v20201208: Replace `brook` + `ufw` combo with `3proxy`. Reduce image size significantly.
 - v20201116: Enable IPv6to4 fallback.
 - v20201109: Use `s6-overlay` instead of `runit`. This change allow setting an environment variable through a file via prefix `FILE__`.
@@ -28,7 +29,13 @@ ARG s6_arch=<your_platform_arch>
 See [s6-overlay release page](https://github.com/just-containers/s6-overlay/releases/latest) to see if your platform is available. The argument can be set using `--build-arg` as below.
 
 ### Build the image
-Build the image with `docker` with BuiltKit enabled:
+Use `build.sh`:
+
+```Shell
+sh build.sh amd64
+```
+
+Or, build the image with `docker` with BuiltKit enabled:
 
 ```Shell
 DOCKER_BUILDKIT=1 docker build --build-arg s6_arch=aarch64 -t ducmthai:nord .
