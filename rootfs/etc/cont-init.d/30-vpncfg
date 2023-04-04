@@ -1,6 +1,4 @@
 #!/command/with-contenv sh
-set -e -u -o pipefail
-
 source ${CONTAINER_CFG}
 
 if [ -z "${PROXY_MODE}" ]; then
