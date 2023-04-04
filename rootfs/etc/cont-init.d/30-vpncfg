@@ -1,4 +1,4 @@
-#!/usr/bin/with-contenv sh
+#!/command/with-contenv sh
 
 source ${CONTAINER_CFG}
 
@@ -41,7 +41,7 @@ OVPN_CONFIG_PATH="/vpn/config/ovpn_${PROTOCOL}/${REGION}.nordvpn.com.${PROTOCOL}
 echo -e "/vpn/config/ovpn_${PROTOCOL}/${REGION}.nordvpn.com.${PROTOCOL}.ovpn" >/var/run/s6/container_environment/OVPN_CONFIG_PATH
 
 if [ ! -f ${OVPN_CONFIG_PATH} ]; then
-  echo "${OVPN_CONFIG_PATH} is not exist. Exiting"
+  echo "${OVPN_CONFIG_PATH} does not exist. Exiting"
   exit 1
 fi
 

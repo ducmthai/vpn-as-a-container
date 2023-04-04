@@ -1,4 +1,4 @@
-#!/usr/bin/with-contenv sh
+#!/command/with-contenv sh
 set -e -u -o pipefail
 
 if [ ! -r ${CONTAINER_CFG} ]; then
@@ -30,7 +30,7 @@ fi
 
 
 if [ ! -f ${OVPN_CONFIG_PATH} ]; then
-  echo "${OVPN_CONFIG_PATH} is not exist. Exiting"
+  echo "${OVPN_CONFIG_PATH} does not exist. Exiting"
   exit 1
 fi
 

@@ -1,6 +1,7 @@
 # Proxy through VPN connection in a Docker container
 ## Changelog
 
+- v20230402: Update to `s6-overlay` version 3.
 - v20220603: Add a `build.sh` script. Set s6-overlay version to 2.2.0.3. Update to version 3 pending.
 - v20201208: Replace `brook` + `ufw` combo with `3proxy`. Reduce image size significantly.
 - v20201116: Enable IPv6to4 fallback.
@@ -20,30 +21,23 @@
 - Update NordVPN connection profiles monthly
 
 ## Build
-### Set architecture
-The container uses pre-built `s6-overlay` binaries. By default, it uses `amd64` s6 binaries. If your platform is different, modify `s6_arch` argument value in `Dockerfile` as follow:
-
-```Dockerfile
-ARG s6_arch=<your_platform_arch>
-```
-See [s6-overlay release page](https://github.com/just-containers/s6-overlay/releases/latest) to see if your platform is available. The argument can be set using `--build-arg` as below.
 
 ### Build the image
-Use `build.sh`:
+Use `build.sh` with an `s6-overlay` version. This version parameter is optional.
 
 ```Shell
-sh build.sh amd64
+sh build.sh 3.1.4.2
 ```
 
 Or, build the image with `docker` with BuiltKit enabled:
 
 ```Shell
-DOCKER_BUILDKIT=1 docker build --build-arg s6_arch=aarch64 -t ducmthai:nord .
+DOCKER_BUILDKIT=1 docker build --build-arg S6_OVERLAY_VERSION="3.1.4.2" -t ducmthai:nord .
 ```
 
 Alternatively, use `docker-compose build`:
 ```Shell
-COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose build --build-arg s6_arch=aarch64
+COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose build S6_OVERLAY_VERSION="3.1.4.2"
 ```
 
 ## Starting the VPN Proxy
