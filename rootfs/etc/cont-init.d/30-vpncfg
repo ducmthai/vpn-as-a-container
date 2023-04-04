@@ -1,4 +1,5 @@
 #!/command/with-contenv sh
+set -e -u -o pipefail
 
 source ${CONTAINER_CFG}
 

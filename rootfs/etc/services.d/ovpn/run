@@ -1,6 +1,4 @@
 #!/command/with-contenv sh
-set -e -u -o pipefail
-
 if [ ! -r ${CONTAINER_CFG} ]; then
   echo "Could not load config file from ${CONTAINER_CFG}. Please check your volume config" 1>&2
   exit 1
