@@ -49,10 +49,8 @@ RUN S6_OVERLAY_URL_PREFIX="https://github.com/just-containers/s6-overlay/release
     && tar -C /root-out -Jxpf /tmp/${S6_OVERLAY_SYMLINKS_ARCH_TAR_FILE}
 
 ADD rootfs /root-out
-RUN chmod +x /root-out/etc/vpnc/vpnc-script \
-    && chmod +x /root-out/opt/utils/healthcheck.sh \
+RUN chmod +x /root-out/opt/utils/healthcheck.sh \
     && chmod +x /root-out/etc/services.d/*/run \
-    && chmod +x /root-out/etc/vpnc/vpnc-script \
     && chmod +x /root-out/etc/cont-init.d/01-contcfg \
     && chmod +x /root-out/etc/cont-init.d/30-vpncfg
 
